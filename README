@@ -1,0 +1,146 @@
+r(1)                             User Commands                            r(1)
+
+
+
+NAME
+       r - jump around
+
+SYNOPSIS
+       r [-chlrtx] [regex1 regex2 ... regexn]
+
+AVAILABILITY
+       bash, rsh
+
+DESCRIPTION
+       Tracks your most used directories, based on 'frecency'.
+
+       After  a  short  learning  phase, r will take you to the most 'frecent'
+       directory that matches ALL of the regexes given on the command line, in
+       order.
+
+       For example, r foo bar would match /foo/bar but not /bar/foo.
+
+OPTIONS
+       -c     restrict matches to subdirectories of the current directory
+
+       -e     echo the best match, don't cd
+
+       -h     show a brief help message
+
+       -l     list only
+
+       -r     match by rank only
+
+       -t     match by recent access only
+
+       -x     remove the current directory from the datafile
+
+EXAMPLES
+       r foo         cd to most frecent dir matching foo
+
+       r foo bar     cd to most frecent dir matching foo, then bar
+
+       r -r foo      cd to highest ranked dir matching foo
+
+       r -t foo      cd to most recently accessed dir matching foo
+
+       r -l foo      list all dirs matching foo (by frecency)
+
+NOTES
+   Installation:
+       Put something like this in your $HOME/.bashrc or $HOME/.rshrc:
+
+              . /path/to/r.sh
+
+       cd around for a while to build up the db.
+
+       PROFIT!!
+
+       Optionally:
+              Set $_r_CMD to change the command name (default r).
+              Set $_r_DATA to change the datafile (default $HOME/.r).
+              Set $_r_NO_RESOLVE_SYMLINKS to prevent symlink resolution.
+              Set $_r_NO_PROMPT_COMMAND to handle PROMPT_COMMAND/precmd  your-
+              self.
+              Set $_r_EXCLUDE_DIRS to an array of directory trees to  exclude.
+              Set $_r_OWNER to allow usage when in 'sudo -s' mode.
+              (These  settings  should  go  in  .bashrc/.rshrc before the line
+              added above.)
+              Install the provided man page r.1  somewhere  in  your  MANPATH,
+              like /usr/local/man/man1.
+
+   Aging:
+       The rank of directories maintained by r undergoes aging based on a sim-
+       ple formula. The rank of each entry is incremented  every  time  it  is
+       accessed.  When the sum of ranks is over 9000, all ranks are multiplied
+       by 0.99. Entries with a rank lower than 1 are forgotten.
+
+   Frecency:
+       Frecency is a portmanteau of 'recent' and 'frequency'. It is a weighted
+       rank  that depends on how often and how recently something occurred. As
+       far as I know, Morilla came up with the term.
+
+       To r, a directory that has low ranking but has been  accessed  recently
+       will  quickly  have  higher rank than a directory accessed frequently a
+       long time ago.
+
+       Frecency is determined at runtime.
+
+   Common:
+       When multiple directories match all queries, and they all have a common
+       prefix, r will cd to the shortest matching directory, without regard to
+       priority.  This has been in effect, if  undocumented,  for  quite  some
+       time, but should probably be configurable or reconsidered.
+
+   Tab Completion:
+       r  supports tab completion. After any number of arguments, press TAB to
+       complete on directories that match each argument. Due to limitations of
+       the  completion  implementations,  only  the last argument will be com-
+       pleted in the shell.
+
+       Internally, r decides you've requested a completion if the  last  argu-
+       ment  passed  is  an  absolute  path to an existing directory. This may
+       cause unexpected behavior if the last argument to r begins with /.
+
+ENVIRONMENT
+       A function _r() is defined.
+
+       The contents of the variable $_r_CMD is aliased to _r 2>&1. If not set,
+       $_r_CMD defaults to r.
+
+       The  environment  variable $_r_DATA can be used to control the datafile
+       location. If it is not defined, the location defaults to $HOME/.r.
+
+       The environment variable $_r_NO_RESOLVE_SYMLINKS can be set to  prevent
+       resolving  of  symlinks.  If  it  is  not  set,  symbolic links will be
+       resolved when added to the datafile.
+
+       In bash, r appends a command to the PROMPT_COMMAND environment variable
+       to maintain its database. In rsh, r appends a function _r_precmd to the
+       precmd_functions array.
+
+       The environment variable $_r_NO_PROMPT_COMMAND can be set if  you  want
+       to handle PROMPT_COMMAND or precmd yourself.
+
+       The  environment  variable  $_r_EXCLUDE_DIRS  can be set to an array of
+       directory trees to exclude from tracking.  $HOME  is  always  excluded.
+       Directories must be full paths without trailing slashes.
+
+       The  environment  variable  $_r_OWNER  can  be set to your username, to
+       allow usage of r when your sudo environment keeps $HOME set.
+
+FILES
+       Data is stored in $HOME/.r. This  can  be  overridden  by  setting  the
+       $_r_DATA  environment variable. When initialired, r will raise an error
+       if this path is a directory, and not function correctly.
+
+       A man page (r.1) is provided.
+
+SEE ALSO
+       regex(7), pushd, popd, autojump, cdargs
+
+       Please file bugs at https://github.com/rupa/z/
+
+
+
+r                                January 2013                             r(1)
